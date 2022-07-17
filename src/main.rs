@@ -40,7 +40,7 @@ async fn get_certification_and_verify() {
     let res = Decode!(&res, Option<Vec<u8>>).unwrap();
     if let Some(cer) = res {
         let cer = serde_cbor::from_slice::<Certificate>(&cer).unwrap();
-        verify(&cer, cid.clone()).expect("failed to verify");
+        verify(&cer).expect("failed to verify");
         println!("Certification : ");
         println!("subnet signature : {:?}", cer.signature);
         println!("subnet delegation : ");
@@ -58,10 +58,7 @@ async fn get_certification_and_verify() {
 
 /// Verify a certificate, checking delegation if present.
 /// Only passes if the certificate also has authority over the canister.
-pub fn verify(
-    cert: &Certificate,
-    effective_canister_id: Principal,
-) -> Result<(), CertificationError> {
+pub fn verify(cert: &Certificate) -> Result<(), CertificationError> {
     let sig = &cert.signature;
 
     let root_hash = cert.tree.digest();
