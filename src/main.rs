@@ -30,7 +30,7 @@ async fn get_certification_and_verify() {
         .call_and_wait(waiter)
         .await
         .unwrap();
-    println!("calling the set function finished");
+    println!("completed the call of the set certification function");
     let res = agent
         .query(&cid, "get")
         .with_arg(&Encode!().unwrap())
