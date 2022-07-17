@@ -69,7 +69,7 @@ pub fn verify(
     msg.extend_from_slice(IC_STATE_ROOT_DOMAIN_SEPARATOR);
     msg.extend_from_slice(&root_hash);
 
-    let der_key = check_delegation(&cert.delegation, effective_canister_id)?;
+    let der_key = check_delegation(&cert.delegation)?;
     let key = extract_der(der_key);
     let result = bls::core_verify(sig, &*msg, &*key);
     if result != bls::BLS_OK {
@@ -80,16 +80,12 @@ pub fn verify(
     }
 }
 
-fn check_delegation(
-    delegation: &Option<Delegation>,
-    effective_canister_id: Principal,
-) -> Result<Vec<u8>, CertificationError> {
+fn check_delegation(delegation: &Option<Delegation>) -> Result<Vec<u8>, CertificationError> {
     match delegation {
         None => Ok(IC_ROOT_KEY.to_vec()),
         Some(delegation) => {
             let cert: Certificate = serde_cbor::from_slice(&delegation.certificate)
                 .map_err(|e| CertificationError::InvalidCborData)?;
-            //verify(&cert, effective_canister_id, disable_range_check)?;
             let public_key_path = [
                 "subnet".into(),
                 delegation.subnet_id.clone().into(),
